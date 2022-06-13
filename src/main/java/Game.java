@@ -1,46 +1,25 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Game {
     public static int CalculateScore(String input) throws InvalidInputException {
-        if (input == null)
-            throw new InvalidInputException("Input is null");
-        if (input.equals(""))
-            throw new InvalidInputException("Input is an empty String");
-
-        List<String> frames = Arrays.asList(input.split(" "));
-        if (frames.size() > 12)
-            throw new InvalidInputException("There are more than 12 frames");
-        if (frames.size() < 10)
-            throw new InvalidInputException("There are less than 10 frames!");
-
-        Pattern pattern = Pattern.compile("[^1-9x/\\-]");
-        Matcher m;
-        for (String frame : frames) {
-            if(frame.length() > 2 )
-                throw new InvalidInputException("Invalid input format, more than 2 throw in a frame");
-            if(frame.charAt(0) == '/')
-                throw new InvalidInputException("Invalid input format, a frame starting with a '/' char");
-            if(frame.equals("xx") || frame.equals("--") || frame.equals("//"))
-                throw new InvalidInputException("Invalid input format, one frame contains more than 1 x,-,/");
-            m = pattern.matcher(frame);
-            if(m.find())
-                throw new InvalidInputException("There is an illegal character in the input!");
+        /*
+         * This regex checks if the input has between 10 and 12 frames and if there are any invalid "xx", "--" or
+         * anything starting with "/" also checks if there are numbers between 1-9,"x","-" or the second character
+         * is a "/"
+         */
+        if (!Pattern.compile("^(?:(?!xx)(?!--)(?:[1-9x\\-][1-9/]?)\\s?){10,12}$").matcher(input).matches()) {
+            throw new InvalidInputException("Invalid input string");
         }
 
-        int score = 0;
-        for (int i = 0; i < 8; i++) {
-            if(frames.get(i).equals("x")){
-                score+= 10;
-            }else if(frames.get(i).equals("-")){
-
-            }
-        }
+        final List<String> frames = List.of(input.split(" "));
 
 
-        return score;
+
+
+        return 0;
     }
 }
