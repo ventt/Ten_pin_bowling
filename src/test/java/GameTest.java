@@ -11,6 +11,63 @@ public class GameTest {
         assertEquals(300, Game.CalculateScore("x x x x x x x x x x x x"));
     }
 
+    /**
+     * Test only without bonuses
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_51() throws InvalidInputException {
+        assertEquals(51, Game.CalculateScore("11 12 13 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with a miss at first char without bonuses
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_50() throws InvalidInputException {
+        assertEquals(50, Game.CalculateScore("11 -2 13 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with a miss at second char without bonuses
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_49() throws InvalidInputException {
+        assertEquals(49, Game.CalculateScore("11 1- 13 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with one strike bonus
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_62() throws InvalidInputException {
+        assertEquals(62, Game.CalculateScore("11 x 13 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with two strike bonus
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_80() throws InvalidInputException {
+        assertEquals(80, Game.CalculateScore("11 x x 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with three strike bonus
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_106() throws InvalidInputException {
+        assertEquals(106, Game.CalculateScore("11 x x x 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with three strike bonus with a third miss
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_103() throws InvalidInputException {
+        assertEquals(103, Game.CalculateScore("11 x x x -5 16 17 18 21 22"));
+    }
+
     //Test a valid string input which contains number, spare and strike. After 10 frames there were given 2 more throw.
     @Test
     public void it_should_be_176() throws InvalidInputException {
@@ -115,4 +172,22 @@ public class GameTest {
         Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x x x 53");
     }
 
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidException_where_strike_code_followed_by_spare() throws InvalidInputException {
+        Game.CalculateScore("x x/ x x x x x x x x x x");
+    }
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidException_where_strike_code_followed_by_number() throws InvalidInputException {
+        Game.CalculateScore("x x2 x x x x x x x x x x");
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidException_where_strike_code_followed_by_miss() throws InvalidInputException {
+        Game.CalculateScore("x x- x x x x x x x x x x");
+    }
+
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidException_where_miss_code_followed_by_strike() throws InvalidInputException {
+        Game.CalculateScore("x -x x x x x x x x x x x");
+    }
 }
