@@ -34,19 +34,21 @@ public class Game {
                     int result = 0;
 
                     final char[] chars = str.toCharArray();
+                    final char firstChar = chars[0];
+                    Optional<Character> secondChar = chars.length == 2 ? Optional.of(chars[1]) : Optional.empty();
 
-                    int firstChar = chars[0] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[0]));
+                    int firstValue = firstChar == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(firstChar));
 
                     // Check if the frame has 2 char. It is important at the last bonus throw
                     // because there can be a frame with one char
-                    if (chars.length == 2) {
-                        if (SPARE_CHAR == chars[1]) {
+                    if (secondChar.isPresent()) {
+                        if (SPARE_CHAR == secondChar.get()) {
                             return 10;
                         }
-                        result += firstChar;
-                        result += chars[1] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[1]));
+                        result += firstValue;
+                        result += secondChar.get() == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(secondChar.get()));
                     } else {
-                        result += firstChar;
+                        result += firstValue;
                     }
 
                     return result;
@@ -96,29 +98,29 @@ public class Game {
         // Check the 9. 10. frames and add the bonus throws if needed
         for (int i = 8; i < 10; i++) {
             final String currentFrame = frames.get(i);
-            final Optional<String> nextFrame = Optional.ofNullable(i + 1 < frames.size() ? frames.get(i + 1) : null);
-            final Optional<String> secondNextFrame = Optional.ofNullable(i + 2 < frames.size() ? frames.get(i + 2) : null);
+            final Optional<String> nextFrame = i + 1 < frames.size() ? Optional.of(frames.get(i + 1)) : Optional.empty();
+            final Optional<String> secondNextFrame = i + 2 < frames.size() ? Optional.of(frames.get(i + 2)) : Optional.empty();
 
             // Validation of bonus throws
             if (i == 9) {
                 // Check if there is a bonus frame after a strike or there is a second bonus frame if the first bonus throw was a strike
-                if ((STRIKE.equals(frames.get(9)) && nextFrame.isEmpty()
-                        || STRIKE.equals(frames.get(9)) && nextFrame.isPresent() && STRIKE.equals(nextFrame.get()) && secondNextFrame.isEmpty())) {
+                final String lastFrame = frames.get(9);
+                if (STRIKE.equals(lastFrame) && nextFrame.isEmpty() || STRIKE.equals(lastFrame) && STRIKE.equals(nextFrame.get()) && secondNextFrame.isEmpty()) {
                     throw new InvalidInputException("Invalid input string");
                 }
 
                 // Check if there is a bonus frame after a spare frame
-                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10 && nextFrame.isEmpty()) {
+                final int lastFrameValue = frameValues.get(9);
+                if (!STRIKE.equals(lastFrame) && lastFrameValue == 10 && nextFrame.isEmpty()) {
                     throw new InvalidInputException("Invalid input string");
                 }
 
                 // Check if there is a 12. bonus frame after a spare frame
-                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10 && secondNextFrame.isPresent()) {
+                if (!STRIKE.equals(lastFrame) && lastFrameValue == 10 && secondNextFrame.isPresent()) {
                     throw new InvalidInputException("Invalid input string");
                 }
                 // Check if there is a second throw bonus after a spare
-                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10
-                        && nextFrame.isPresent() && nextFrame.get().length() == 2) {
+                if (!STRIKE.equals(lastFrame) && lastFrameValue == 10 && nextFrame.get().length() == 2) {
                     throw new InvalidInputException("Invalid input string");
                 }
             }
