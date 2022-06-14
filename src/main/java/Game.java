@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Game {
@@ -30,16 +31,24 @@ public class Game {
                         return 0;
                     }
 
-                    // String must have 2 chars, there is no point of testing it
+                    int result = 0;
+
                     final char[] chars = str.toCharArray();
 
-                    if (SPARE_CHAR == chars[1]) {
-                        return 10;
+                    int firstChar = chars[0] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[0]));
+
+                    // Check if the frame has 2 char. It is important at the last bonus throw
+                    // because there can be a frame with one char
+                    if (chars.length == 2) {
+                        if (SPARE_CHAR == chars[1]) {
+                            return 10;
+                        }
+                        result += firstChar;
+                        result += chars[1] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[1]));
+                    } else {
+                        result += firstChar;
                     }
 
-                    int result = 0;
-                    result += chars[0] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[0]));
-                    result += chars[1] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[1]));
                     return result;
                 }).toList();
 
@@ -71,9 +80,62 @@ public class Game {
                     result += frameValues.get(i + 1);
                 }
             }
+            // Check if not strike but the value of the frame is 10 than it is a spare
+            if (!STRIKE.equals(currentFrame) && frameValues.get(i) == 10) {
+                // If the next throw is a strike add 10 otherwise add the next frame's first value
+                if (STRIKE.equals(nextFrame)) {
+                    result += 10;
+                } else {
+                    final char[] chars = nextFrame.toCharArray();
+                    result += chars[0] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[0]));
+                }
+            }
         }
-//        final Optional<String> nextFrame = Optional.ofNullable(i + 1 < frames.size() ? frames.get(i + 1) : null);
-//        final Optional<String> secondNextFrame = Optional.ofNullable(i + 2 < frames.size() ? frames.get(i + 2) : null);
+
+
+        // Check the 9. 10. frames and add the bonus throws if needed
+        for (int i = 8; i < 10; i++) {
+            final String currentFrame = frames.get(i);
+            final Optional<String> nextFrame = Optional.ofNullable(i + 1 < frames.size() ? frames.get(i + 1) : null);
+            final Optional<String> secondNextFrame = Optional.ofNullable(i + 2 < frames.size() ? frames.get(i + 2) : null);
+
+            // Validation of bonus throws
+            if (i == 9) {
+                // Check if there is a bonus frame after a strike or there is a second bonus frame if the first bonus throw was a strike
+                if ((STRIKE.equals(frames.get(9)) && nextFrame.isEmpty()
+                        || STRIKE.equals(frames.get(9)) && nextFrame.isPresent() && STRIKE.equals(nextFrame.get()) && secondNextFrame.isEmpty())) {
+                    throw new InvalidInputException("Invalid input string");
+                }
+
+                // Check if there is a bonus frame after a spare frame
+                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10 && nextFrame.isEmpty()) {
+                    throw new InvalidInputException("Invalid input string");
+                }
+
+                // Check if there is a 12. bonus frame after a spare frame
+                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10 && secondNextFrame.isPresent()) {
+                    throw new InvalidInputException("Invalid input string");
+                }
+                // Check if there is a second throw bonus after a spare
+                if (!STRIKE.equals(frames.get(9)) && frameValues.get(9) == 10
+                        && nextFrame.isPresent() && nextFrame.get().length() == 2) {
+                    throw new InvalidInputException("Invalid input string");
+                }
+            }
+
+            // If there is a strike and the next frame is not null add the next frame value
+            if (STRIKE.equals(currentFrame) && nextFrame.isPresent()) {
+                result += frameValues.get(i + 1);
+                // If there is a spare and the next frame is not null add the next frame otherwise just add the frame value
+            } else if (!STRIKE.equals(currentFrame) && frameValues.get(i) == 10 && nextFrame.isPresent()) {
+                if (STRIKE.equals(nextFrame.get())) {
+                    result += 10;
+                } else {
+                    final char[] chars = nextFrame.get().toCharArray();
+                    result += chars[0] == MISS_CHAR ? 0 : Integer.parseInt(String.valueOf(chars[0]));
+                }
+            }
+        }
 
         return result;
     }

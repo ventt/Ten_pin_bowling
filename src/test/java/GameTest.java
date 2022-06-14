@@ -67,11 +67,42 @@ public class GameTest {
     public void it_should_be_103() throws InvalidInputException {
         assertEquals(103, Game.CalculateScore("11 x x x -5 16 17 18 21 22"));
     }
+    /**
+     * Test with spare than a number
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_59() throws InvalidInputException {
+        assertEquals(59, Game.CalculateScore("11 1/ 13 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with spare than a miss
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_57() throws InvalidInputException {
+        assertEquals(57, Game.CalculateScore("11 1/ -3 14 15 16 17 18 21 22"));
+    }
+    /**
+     * Test with spare than a strike
+     * @throws InvalidInputException
+     */
+    @Test
+    public void it_should_be_79() throws InvalidInputException {
+        assertEquals(79, Game.CalculateScore("11 1/ x 14 15 16 17 18 21 22"));
+    }
 
     //Test a valid string input which contains number, spare and strike. After 10 frames there were given 2 more throw.
     @Test
     public void it_should_be_176() throws InvalidInputException {
         assertEquals(176, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x x x 5"));
+    }
+    /**
+        Test a valid input 10. throw is a spare and the next throw is a 5
+     */
+    @Test
+    public void it_should_be_161() throws InvalidInputException {
+        assertEquals(161, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x 5/ 5"));
     }
 
     //Test a valid string input which contains full missed frames which coded as a single '-' char.
@@ -88,14 +119,14 @@ public class GameTest {
 
     //Test a valid string input which contains a spare in the 10. frame.
     @Test
-    public void it_should_be_163() throws InvalidInputException {
-        assertEquals(163, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x 2/ x"));
+    public void it_should_be_171() throws InvalidInputException {
+        assertEquals(171, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x 2/ x"));
     }
 
     //Test a valid string input which not contains a spare or strike in the 10. frame.
     @Test
-    public void it_should_be_153() throws InvalidInputException {
-        assertEquals(153, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x 25"));
+    public void it_should_be_145() throws InvalidInputException {
+        assertEquals(145, Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x 25"));
     }
 
     //Test an invalid input which is null
@@ -159,17 +190,48 @@ public class GameTest {
         Game.CalculateScore("53 x 7/ 9/ 24 6/ // x x x");
     }
 
-
-    //Test an invalid input where the 11. bonus throw is not a strike and one more frame were given
+    /**
+     * Test with an invalid input where there are no bonus throws after a strike
+     * @throws InvalidInputException
+     */
     @Test(expected = InvalidInputException.class)
-    public void it_should_throw_InvalidInputException_where_three_more_bonus_throw_were_given() throws InvalidInputException {
-        Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x x 53 5");
+    public void it_should_throw_InvalidInputException_when_there_is_no_bonus_frames_after_a_strike() throws InvalidInputException {
+        Game.CalculateScore("53 x 7/ 9/ 24 6/ 5/ x x x");
     }
 
-    //Test an invalid input where the 11. bonus throw is a strike and one more whole frame were given
+    /**
+     * Test with an invalid input where there are no second bonus throw after a strike
+     * @throws InvalidInputException
+     */
     @Test(expected = InvalidInputException.class)
-    public void it_should_throw_InvalidInputException_after_bonus_strike_and_whole_frame_follows() throws InvalidInputException {
-        Game.CalculateScore("53 72 x x 7/ 9/ 24 6/ x x x 53");
+    public void it_should_throw_InvalidInputException_when_there_is_no_second_bonus_throw_after_a_strike() throws InvalidInputException {
+        Game.CalculateScore("53 x 7/ 9/ 24 6/ 5/ x x x x");
+    }
+
+    /**
+     * Test with an invalid input where there is no bonus throw after a spare
+     * @throws InvalidInputException
+     */
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidInputException_when_there_is_no_bonus_throw_after_a_spare() throws InvalidInputException {
+        Game.CalculateScore("53 x 7/ 9/ 24 6/ 5/ x x 2/");
+    }
+
+    /**
+     * Test with an invalid input where there is a second bonus frame after a spare
+     * @throws InvalidInputException
+     */
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidInputException_when_there_is_a_second_bonus_frame_after_a_spare() throws InvalidInputException {
+        Game.CalculateScore("53 x 7/ 9/ 24 6/ 5/ x x 2/ x x");
+    }
+    /**
+     * Test with an invalid input where there is a second bonus throw after a spare
+     * @throws InvalidInputException
+     */
+    @Test(expected = InvalidInputException.class)
+    public void it_should_throw_InvalidInputException_when_there_is_a_second_bonus_throw_after_a_spare() throws InvalidInputException {
+        Game.CalculateScore("53 x 7/ 9/ 24 6/ 5/ x x 2/ 12");
     }
 
     @Test(expected = InvalidInputException.class)
